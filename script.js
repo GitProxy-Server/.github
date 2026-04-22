@@ -33,10 +33,7 @@
     try {
       const ref = new URL(document.referrer);
       if (ref.hostname === 'github.com') {
-        const pathParts = ref.pathname.split('/').filter(p => p);
-        if (pathParts.length >= 1) {
-          return pathParts[pathParts.length - 1];
-        }
+        return ref.origin + ref.pathname;
       }
     } catch(e) {}
   }
