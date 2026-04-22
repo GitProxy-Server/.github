@@ -41,31 +41,31 @@
     ];
 
     function extractRepoName() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const repoParam = urlParams.get('repo');
-      if (repoParam) return repoParam;
-      
-      if (document.referrer) {
-        try {
-          const referrerUrl = new URL(document.referrer);
-          if (referrerUrl.hostname === 'github.com') {
-            const pathParts = referrerUrl.pathname.split('/').filter(p => p);
-            if (pathParts.length >= 2) {
-              return pathParts[1];
-            }
-          }
-        } catch (e) {}
+  const urlParams = new URLSearchParams(window.location.search);
+  const repoParam = urlParams.get('repo');
+  if (repoParam) return repoParam;
+  
+  if (document.referrer) {
+    try {
+      const referrerUrl = new URL(document.referrer);
+      if (referrerUrl.hostname === 'github.com') {
+        const pathParts = referrerUrl.pathname.split('/').filter(p => p);
+        if (pathParts.length >= 1) {
+          return pathParts[pathParts.length - 1];
+        }
       }
+    } catch (e) {}
+  }
 
-      if (repoNameMeta && repoNameMeta.content) {
-        return repoNameMeta.content;
-      }
+  if (repoNameMeta && repoNameMeta.content) {
+    return repoNameMeta.content;
+  }
 
-      const path = window.location.pathname;
-      const cleanPath = path.replace(/^\/+|\/+$/g, '');
-      const parts = cleanPath.split('/');
-      return parts[parts.length - 1] || 'quick-start-guide';
-    }
+  const path = window.location.pathname;
+  const cleanPath = path.replace(/^\/+|\/+$/g, '');
+  const parts = cleanPath.split('/');
+  return parts[parts.length - 1] || 'quick-start-guide';
+}
 
     const repoName = extractRepoName();
     if (repoNameMeta) {
