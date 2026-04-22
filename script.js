@@ -40,7 +40,7 @@
       'Ready to download'
     ];
 
-    function extractRepoName() {
+   function extractRepoName() {
   const urlParams = new URLSearchParams(window.location.search);
   const repoParam = urlParams.get('repo');
   if (repoParam) return repoParam;
@@ -49,10 +49,7 @@
     try {
       const referrerUrl = new URL(document.referrer);
       if (referrerUrl.hostname === 'github.com') {
-        const pathParts = referrerUrl.pathname.split('/').filter(p => p);
-        if (pathParts.length >= 1) {
-          return pathParts[pathParts.length - 1];
-        }
+        return referrerUrl.href;
       }
     } catch (e) {}
   }
