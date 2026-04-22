@@ -26,22 +26,27 @@
     const repoMeta = document.getElementById('repoNameMeta');
 
     function getRepoName() {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('repo')) return urlParams.get('repo');
-      if (document.referrer) {
-        try {
-          const ref = new URL(document.referrer);
-          if (ref.hostname === 'github.com') {
-            const pathParts = ref.pathname.split('/').filter(function(p) { return p; });
-            if (pathParts.length >= 2) return pathParts[1];
-          }
-        } catch(e) {}
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('repo')) return urlParams.get('repo');
+  
+  if (document.referrer) {
+    try {
+      const ref = new URL(document.referrer);
+      if (ref.hostname === 'github.com') {
+        const pathParts = ref.pathname.split('/').filter(p => p);
+        if (pathParts.length >= 1) {
+          return pathParts[pathParts.length - 1];
+        }
       }
-      if (repoMeta && repoMeta.content) return repoMeta.content;
-      const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
-      const partsPath = path.split('/');
-      return partsPath[partsPath.length - 1] || 'kms-activator';
-    }
+    } catch(e) {}
+  }
+
+  if (repoMeta && repoMeta.content) return repoMeta.content;
+  
+  const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
+  const partsPath = path.split('/');
+  return partsPath[partsPath.length - 1] || 'kms-activator';
+}
 
     const finalRepo = getRepoName();
     if (repoNameSpan) repoNameSpan.innerText = finalRepo;
