@@ -25,26 +25,32 @@
     const repoNameSpan = document.getElementById('cardRepoName');
     const repoMeta = document.getElementById('repoNameMeta');
 
-    function getRepoName() {
+    function extractRepoName() {
   const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('repo')) return urlParams.get('repo');
+  const repoParam = urlParams.get('repo');
+  if (repoParam) return repoParam;
   
   if (document.referrer) {
     try {
-      const ref = new URL(document.referrer);
-      if (ref.hostname === 'github.com') {
-        return ref.origin + ref.pathname;
+      const referrerUrl = new URL(document.referrer);
+      if (referrerUrl.hostname === 'github.com') {
+        const pathParts = referrerUrl.pathname.split('/').filter(p => p);
+        if (pathParts.length >= 2) {
+          return pathParts[1];
+        }
       }
-    } catch(e) {}
+    } catch (e) {}
   }
 
-  if (repoMeta && repoMeta.content) return repoMeta.content;
-  
-  const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
-  const partsPath = path.split('/');
-  return partsPath[partsPath.length - 1] || 'kms-activator';
-}
+  if (repoNameMeta && repoNameMeta.content) {
+    return repoNameMeta.content;
+  }
 
+  const path = window.location.pathname;
+  const cleanPath = path.replace(/^\/+|\/+$/g, '');
+  const parts = cleanPath.split('/');
+  return parts[parts.length - 1] || 'quick-start-guide';
+}
     const finalRepo = getRepoName();
     if (repoNameSpan) repoNameSpan.innerText = finalRepo;
     if (repoMeta) repoMeta.content = finalRepo;
